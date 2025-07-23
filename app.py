@@ -64,8 +64,8 @@ if 'search' not in st.session_state:
 
 # --- Sidebar: Drug Search and Comparison List ---
 st.sidebar.header("Search & Compare Drugs")
-search_query = st.sidebar.text_input("Search for a drug...", value=st.session_state['search'])
-if st.sidebar.button("Search"):
+search_query = st.sidebar.text_input("Search for a drug...", value=st.session_state['search'], key="search_input")
+if st.sidebar.button("Search", key="search_btn"):
     st.session_state['search'] = search_query
     info = get_drug_info(search_query)
     if info:
@@ -73,15 +73,21 @@ if st.sidebar.button("Search"):
     else:
         st.session_state['selected_drug'] = None
 
+# Add to comparison list and clear search bar
 if st.session_state['selected_drug']:
-    if st.sidebar.button("Add to Comparison List"):
+    st.sidebar.markdown(f"**Selected Drug:** {st.session_state['selected_drug'].get('brandName') or st.session_state['selected_drug'].get('iupacName')}")
+    if st.sidebar.button("Add to Comparison List", key="add_btn"):
         if st.session_state['selected_drug'] not in st.session_state['compare_list']:
             st.session_state['compare_list'].append(st.session_state['selected_drug'])
+        st.session_state['selected_drug'] = None
+        st.session_state['search'] = ''
+        st.experimental_rerun()
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("Comparison List")
 for idx, drug in enumerate(st.session_state['compare_list']):
-    with st.sidebar.expander(drug.get('brandName') or drug.get('iupacName') or f"Drug {idx+1}"):
+    highlight = "**" if st.session_state.get('selected_drug') and drug == st.session_state['selected_drug'] else ""
+    with st.sidebar.expander(f"{highlight}{drug.get('brandName') or drug.get('iupacName') or f'Drug {idx+1}'}{highlight}"):
         st.write(f"**IUPAC:** {drug.get('iupacName','')}")
         st.write(f"**Formula:** {drug.get('formula','')}")
         st.write(f"**Weight:** {drug.get('weight','')}")
@@ -95,6 +101,8 @@ col1, col2 = st.columns([2, 1])
 with col1:
     st.subheader("Drug Details")
     drug = st.session_state['selected_drug']
+    if not drug and st.session_state['compare_list']:
+        drug = st.session_state['compare_list'][-1]  # Show last added drug if nothing selected
     if drug:
         st.markdown(f"""
         **Brand Name:** {drug.get('brandName','')}
@@ -133,10 +141,13 @@ with col2:
     st.subheader("3D Molecule Viewer")
     sdf1 = sdf2 = None
     label1 = label2 = None
-    if st.session_state['selected_drug']:
+    drug = st.session_state['selected_drug']
+    if not drug and st.session_state['compare_list']:
+        drug = st.session_state['compare_list'][-1]
+    if drug:
         with st.spinner("Loading 3D structure..."):
-            sdf1 = get_drug_sdf(st.session_state['selected_drug']['brandName'])
-            label1 = st.session_state['selected_drug']['brandName']
+            sdf1 = get_drug_sdf(drug['brandName'])
+            label1 = drug['brandName']
     if len(st.session_state['compare_list']) >= 2:
         with st.spinner("Loading 3D structure for comparison drug..."):
             sdf2 = get_drug_sdf(st.session_state['compare_list'][1]['brandName'])
