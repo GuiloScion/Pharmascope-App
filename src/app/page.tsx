@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import DrugSearchBar from "@/components/DrugSearchBar";
 import DrugDetailsCard, { DrugInfo } from "@/components/DrugDetailsCard";
 import Molecule3DViewer from "@/components/Molecule3DViewer";
-import DrugInteractionPanel, { InteractionData } from "@/components/DrugInteractionPanel";
+import DrugInteractionPanel from "@/components/DrugInteractionPanel";
 import { getDrugInfo, getDrugSDF } from "@/lib/pubchem";
 import { getDrugInteraction } from "@/lib/rxnav";
 
