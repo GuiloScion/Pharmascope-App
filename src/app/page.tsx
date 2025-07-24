@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import DrugSearchBar from "@/components/DrugSearchBar";
 import DrugDetailsCard, { DrugInfo } from "@/components/DrugDetailsCard";
 import Molecule3DViewer from "@/components/Molecule3DViewer";
-import DrugInteractionPanel from "@/components/DrugInteractionPanel";
+import DrugInteractionPanel, { InteractionData } from "@/components/DrugInteractionPanel";
 import { getDrugInfo, getDrugSDF } from "@/lib/pubchem";
 import { getDrugInteraction } from "@/lib/rxnav";
 
@@ -15,7 +15,7 @@ export default function PharmaScopePage() {
   const [drug2, setDrug2] = useState<DrugInfo | null>(null);
   const [sdf2, setSdf2] = useState<string | null>(null);
   // Interaction
-  const [interaction, setInteraction] = useState<any>(null);
+  const [interaction, setInteraction] = useState<InteractionData | null>(null);
   const [interactionLoading, setInteractionLoading] = useState(false);
   const [interactionError, setInteractionError] = useState<string | null>(null);
 
@@ -67,8 +67,12 @@ export default function PharmaScopePage() {
         drug2.brandName || ""
       );
       setInteraction(result);
-    } catch (e: any) {
-      setInteractionError(e.message || "Error fetching interaction");
+    } catch (e: unknown) {
+      if (e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string') {
+        setInteractionError((e as any).message);
+      } else {
+        setInteractionError("Error fetching interaction");
+      }
     } finally {
       setInteractionLoading(false);
     }
