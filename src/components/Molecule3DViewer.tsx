@@ -12,19 +12,21 @@ const SingleMolViewer: React.FC<{ sdf: string; color: string; label?: string }> 
 
   useEffect(() => {
     if (!viewerRef.current) return;
-    // @ts-ignore
-    const $3Dmol = require('3dmol');
-    viewerRef.current.innerHTML = "";
-    const viewer = $3Dmol.createViewer(viewerRef.current, {
-      backgroundColor: 'white',
-      width: 300,
-      height: 300,
-    });
-    viewer.addModel(sdf, 'sdf');
-    viewer.setStyle({}, { stick: { color }, sphere: { scale: 0.3, color } });
-    viewer.zoomTo();
-    viewer.render();
-    viewer.zoom(1.2, 1000);
+    (async () => {
+      // @ts-expect-error
+      const $3Dmol = (await import('3dmol')).default;
+      viewerRef.current!.innerHTML = "";
+      const viewer = $3Dmol.createViewer(viewerRef.current, {
+        backgroundColor: 'white',
+        width: 300,
+        height: 300,
+      });
+      viewer.addModel(sdf, 'sdf');
+      viewer.setStyle({}, { stick: { color }, sphere: { scale: 0.3, color } });
+      viewer.zoomTo();
+      viewer.render();
+      viewer.zoom(1.2, 1000);
+    })();
   }, [sdf, color]);
 
   return (
