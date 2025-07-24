@@ -7,6 +7,12 @@ import DrugInteractionPanel from "@/components/DrugInteractionPanel";
 import { getDrugInfo, getDrugSDF } from "@/lib/pubchem";
 import { getDrugInteraction } from "@/lib/rxnav";
 
+type InteractionData = {
+  description: string;
+  severity: string;
+  explanation?: string;
+};
+
 export default function PharmaScopePage() {
   // Drug 1 state
   const [drug1, setDrug1] = useState<DrugInfo | null>(null);
