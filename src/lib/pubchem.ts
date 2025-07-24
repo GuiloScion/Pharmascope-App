@@ -7,11 +7,15 @@ export async function getDrugInfo(drugName: string) {
   const compound = data?.PC_Compounds?.[0];
   // Extract fields (brand, IUPAC, formula, weight, description, class, indications, side effects)
   // This is a stub; real extraction would parse the JSON structure
+  type CompoundProp = {
+    urn?: { label?: string };
+    value?: { sval?: string; fval?: number };
+  };
   return {
     brandName: drugName,
-    iupacName: compound?.props?.find((p: any) => p.urn?.label === 'IUPAC Name')?.value?.sval || '',
-    formula: compound?.props?.find((p: any) => p.urn?.label === 'Molecular Formula')?.value?.sval || '',
-    weight: compound?.props?.find((p: any) => p.urn?.label === 'Molecular Weight')?.value?.fval?.toString() || '',
+    iupacName: compound?.props?.find((p: CompoundProp) => p.urn?.label === 'IUPAC Name')?.value?.sval || '',
+    formula: compound?.props?.find((p: CompoundProp) => p.urn?.label === 'Molecular Formula')?.value?.sval || '',
+    weight: compound?.props?.find((p: CompoundProp) => p.urn?.label === 'Molecular Weight')?.value?.fval?.toString() || '',
     description: '', // PubChem summary not always available in this endpoint
     drugClass: '',
     indications: '',
